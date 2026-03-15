@@ -1,5 +1,5 @@
 public class Outcast {
-    private WordNet wordnet;
+    private final WordNet wordnet;
     public Outcast(WordNet wordnet) {
         if (wordnet == null)
             throw new IllegalArgumentException();

@@ -1,51 +1,19 @@
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class WordNet {
 
-    private Map<String, List<Integer>> nounToIds;
-    private ArrayList<String> idToSynset;
-    private Digraph graph;
-    private SAP sap;
-
-    private void checkCycle(Digraph g, int[] deg) {
-        Queue<Integer> q = new LinkedList<>();
-        for (int i = 0; i < g.V(); i++) {
-            if (deg[i] == 0) {
-                q.add(i);
-            }
-        }
-        while (!q.isEmpty()) {
-            int u = q.poll();
-            for (int v : g.adj(u)) {
-                deg[v]--;
-                if (deg[v] == 0) {
-                    q.add(v);
-                }
-            }
-        }
-        for (int i = 0; i < g.V(); i++) {
-            if (deg[i] > 0) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    private void checkRooted(Digraph g) {
-        int roots = 0;
-
-        for (int v = 0; v < g.V(); v++) {
-            if (!g.adj(v).iterator().hasNext()) {
-                roots++;
-            }
-        }
-
-        if (roots != 1) {
-            throw new IllegalArgumentException();
-        }
-    }
+    private final Map<String, List<Integer>> nounToIds;
+    private final ArrayList<String> idToSynset;
+    private final Digraph graph;
+    private final SAP sap;
 
     public WordNet(String synsets, String hypernyms) {
         if (synsets == null || hypernyms == null)
@@ -91,6 +59,43 @@ public class WordNet {
 
         sap = new SAP(graph);
 
+    }
+
+    private void checkCycle(Digraph g, int[] deg) {
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < g.V(); i++) {
+            if (deg[i] == 0) {
+                q.add(i);
+            }
+        }
+        while (!q.isEmpty()) {
+            int u = q.poll();
+            for (int v : g.adj(u)) {
+                deg[v]--;
+                if (deg[v] == 0) {
+                    q.add(v);
+                }
+            }
+        }
+        for (int i = 0; i < g.V(); i++) {
+            if (deg[i] > 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private void checkRooted(Digraph g) {
+        int roots = 0;
+
+        for (int v = 0; v < g.V(); v++) {
+            if (!g.adj(v).iterator().hasNext()) {
+                roots++;
+            }
+        }
+
+        if (roots != 1) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public Iterable<String> nouns() {
