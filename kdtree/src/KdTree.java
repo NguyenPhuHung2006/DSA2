@@ -138,45 +138,37 @@ public class KdTree {
         return list;
     }
 
-    private Point2D nearest(Node node, Point2D p, Point2D bestPoint) {
+    private Point2D nearest(Node node, Point2D query, Point2D best) {
         if (node == null) {
-            return bestPoint;
+            return best;
         }
-        double bestDist = p.distanceSquaredTo(bestPoint);
-        if (node.rect.distanceSquaredTo(p) > bestDist) {
-            return bestPoint;
+
+        double bestDist = query.distanceSquaredTo(best);
+
+        if (node.rect.distanceSquaredTo(query) > bestDist) {
+            return best;
         }
-        double dist = p.distanceSquaredTo(node.p);
+
+        double dist = query.distanceSquaredTo(node.p);
         if (dist < bestDist) {
-            bestPoint = node.p;
+            best = node.p;
         }
 
-        Node first, second;
+        boolean goLeft = node.isSplitX
+                ? query.x() < node.p.x()
+                : query.y() < node.p.y();
 
-        if (node.isSplitX) {
-            if (p.x() < node.p.x()) {
-                first = node.left;
-                second = node.right;
-            } else {
-                first = node.right;
-                second = node.left;
-            }
-        } else {
-            if (p.y() < node.p.y()) {
-                first = node.left;
-                second = node.right;
-            } else {
-                first = node.right;
-                second = node.left;
-            }
-        }
-        bestPoint = nearest(first, p, bestPoint);
-        bestDist = p.distanceSquaredTo(bestPoint);
-        if (second != null && second.rect.distanceSquaredTo(p) < bestDist) {
-            bestPoint = nearest(second, p, bestPoint);
+        Node first = goLeft ? node.left : node.right;
+        Node second = goLeft ? node.right : node.left;
+
+        best = nearest(first, query, best);
+
+        if (second != null &&
+            second.rect.distanceSquaredTo(query) < query.distanceSquaredTo(best)) {
+            best = nearest(second, query, best);
         }
 
-        return bestPoint;
+        return best;
     }
 
     public Point2D nearest(Point2D p) {
